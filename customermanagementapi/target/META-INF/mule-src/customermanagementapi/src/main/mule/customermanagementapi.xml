@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<db:config name="Training_Database" doc:name="Database Config" doc:id="01200aa0-0735-4f37-b8be-b9bafbab2959" >
+		<db:my-sql-connection host="mudb.learn.mulesoft.com" port="3306" user="mule" password="mule" database="training" />
+	</db:config>
+
+	<db:config name="CustomersDB" doc:name="Database Config" doc:id="ffdc4e31-7f5b-42c6-a322-7a749cebca59" >
+		<db:my-sql-connection host="mudb.learn.mulesoft.com" port="3306" user="mule" password="mule" database="training" />
+	</db:config>
+	<flow name="customermanagementapiFlow" doc:id="3678b79a-e74a-420e-89b3-9dcc658f42d6" >
+		<http:listener doc:name="Listener" doc:id="38846d7e-ae47-44f7-8eaa-e7717d892840" path="/mudb.learn.mulesoft.com/api/v1/sps/customers" config-ref="API_CustomerDB_Listener"/>
+		<db:select doc:name="Select" doc:id="d57dacff-daf2-4cd7-ab57-5d30c0f42ecc" config-ref="Training_Database">
+			<db:sql ><![CDATA[SELECT * FROM customers;]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="53600d66-b841-424f-9309-f66099f556ab" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-payload doc:name="CustomerInfo" doc:id="fa231d12-c2b5-49b3-9155-e17b13722253" value="#[payload]"/>
+	</flow>
+</mule>
